@@ -1,0 +1,75 @@
+<Project Sdk="Microsoft.Build.Traversal">
+
+  <Target Name="ILLinkTrimSharedFramework"
+          AfterTargets="Build">
+    <PropertyGroup>
+      <LibrariesILLinkTrimInputPath>$(LibrariesSharedFrameworkBinArtifactsPath)PreTrim\</LibrariesILLinkTrimInputPath>
+      <LibrariesToLinkOutputPath>$(LibrariesSharedFrameworkBinArtifactsPath)</LibrariesToLinkOutputPath>
+    </PropertyGroup>
+
+    <PropertyGroup>
+      <!-- default action for core assemblies -->
+      <ILLinkArgs>$(ILLinkArgs) -c link</ILLinkArgs>
+      <!-- keep type-forward assemblies (facades) -->
+      <ILLinkArgs>$(ILLinkArgs) -t</ILLinkArgs>
+      <!-- Update debug symbols -->
+      <ILLinkArgs>$(ILLinkArgs) -b true</ILLinkArgs>
+      <!-- keep types and members required by Debugger-related attributes -->
+      <ILLinkArgs>$(ILLinkArgs) -v true</ILLinkArgs>
+      <!-- don't remove the embedded root xml resource since ILLink may run again on the assembly -->
+      <ILLinkArgs>$(ILLinkArgs) --strip-resources false</ILLinkArgs>
+      <!-- ignore unresolved references -->
+      <ILLinkArgs>$(ILLinkArgs) --skip-unresolved true</ILLinkArgs>
+      <!-- keep interface implementations -->
+      <ILLinkArgs>$(ILLinkArgs) --disable-opt unusedinterfaces</ILLinkArgs>
+      <!-- keep PreserveDependencyAttribute -->
+      <ILLinkArgs>$(ILLinkArgs) --keep-dep-attributes true</ILLinkArgs>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <!-- add 2 directories to load references: the libraries directory and CoreLib's directory -->
+      <_DependencyDirectories Include="$(LibrariesILLinkTrimInputPath.TrimEnd('\'))" />
+      <_DependencyDirectories Include="$(CoreCLRArtifactsPath.TrimEnd('\'))" />
+    </ItemGroup>
+
+    <PropertyGroup>
+      <ILLinkArgs>$(ILLinkArgs) -d @(_DependencyDirectories->'"%(Identity)"', ' -d ')</ILLinkArgs>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <_AssembliesToLink Include="System.Private.CoreLib" />
+
+      <_LibrariesToLink Include="$(LibrariesILLinkTrimInputPath)*.dll" />
+      <_AssembliesToLink Include="@(_LibrariesToLink->'%(FileName)')" />
+    </ItemGroup>
+
+    <PropertyGroup>
+      <ILLinkArgs>$(ILLinkArgs) -r @(_AssembliesToLink->'%(Identity)', ' -r ')</ILLinkArgs>
+
+      <!-- Not currently using the trimmed CoreLib because it has already been trimmed and crossgen'd. -->
+      <ILLinkArgs>$(ILLinkArgs) -p copy System.Private.CoreLib</ILLinkArgs>
+    </PropertyGroup>
+
+    <!-- When running from Desktop MSBuild, DOTNET_HOST_PATH is not set.
+         In this case, explicitly specify the path to the dotnet host. -->
+    <PropertyGroup Condition=" '$(DOTNET_HOST_PATH)' == '' ">
+      <_DotNetHostDirectory>$(RepoRoot).dotnet</_DotNetHostDirectory>
+      <_DotNetHostFileName>dotnet</_DotNetHostFileName>
+      <_DotNetHostFileName Condition=" '$(OS)' == 'Windows_NT' ">dotnet.exe</_DotNetHostFileName>
+    </PropertyGroup>
+    
+    <ILLink AssemblyPaths=""
+            RootAssemblyNames=""
+            OutputDirectory="$(LibrariesToLinkOutputPath)"
+            ExtraArgs="$(ILLinkArgs)"
+            ToolExe="$(_DotNetHostFileName)"
+            ToolPath="$(_DotNetHostDirectory)" />
+
+    <!-- Remove the copied CoreLib since it is not used. -->
+    <Delete Files="$(LibrariesToLinkOutputPath)System.Private.CoreLib.dll" />
+    
+  </Target>
+
+  <Import Project="$(RepositoryEngineeringDir)illink.targets" />
+
+</Project>

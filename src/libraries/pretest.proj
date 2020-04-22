@@ -20,8 +20,22 @@
              Properties="$(TraversalGlobalProperties)" />
   </Target>
 
+  <Target Name="CopyILTrimmedSharedFrameworkLibraries"
+          Condition="'$(BinplaceTestSharedFramework)' == 'true' and '$(BuildTargetFramework)' == '$(NetCoreAppCurrent)'"
+          AfterTargets="RestoreTestHost">
+
+    <ItemGroup>
+      <LibrariesSharedFrameworkFiles Include="$(LibrariesSharedFrameworkBinArtifactsPath)*.*" />
+    </ItemGroup>
+    
+    <Copy SourceFiles="@(LibrariesSharedFrameworkFiles)"
+          DestinationFolder="$(TestHostRuntimePath)" />
+    
+  </Target>
+  
   <!-- Microsoft.XmlSerializer.Generator should not be marked as a platform item and be copy-local instead. -->
   <Target Name="CollectSharedFrameworkRuntimeFiles"
+          DependsOnTargets="CopyILTrimmedSharedFrameworkLibraries"
           Condition="'$(PlatformManifestFile)' != '' and '$(BuildingNETCoreAppVertical)' == 'true'">
     <ItemGroup>
       <_manualSharedFrameworkRuntimeFiles Include="System.Security.Cryptography.Native.OpenSsl.so" />

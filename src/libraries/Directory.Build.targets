@@ -57,6 +57,9 @@
     <BinPlaceRuntime Condition="'$(BinPlaceRuntime)' == '' And ('$(IsRuntimeAssembly)' == 'true' or '$(IsRuntimeAndReferenceAssembly)' == 'true')">true</BinPlaceRuntime>
     <BinPlaceForTargetVertical Condition="'$(BinPlaceForTargetVertical)' == ''">true</BinPlaceForTargetVertical>
     <AllTargetFrameworks>net45;net451;net46;net461;net462;net47;net471;net472;netstandard1.0;netstandard1.1;netstandard1.2;netstandard1.3;netstandard1.4;netstandard1.5;netstandard1.6;netstandard2.0;netstandard2.0;netcoreapp2.0;netcoreapp2.1;netcoreapp3.0;$(netcoreappCurrent);</AllTargetFrameworks>
+
+    <!-- All IsNETCoreApp assemblies will get binplaced to the test sharedframework after the ILLink step. -->
+    <BinPlaceTestSharedFramework Condition="'$(IsNETCoreApp)' == 'true' and '$(BuildAllProjects)' == 'true'">false</BinPlaceTestSharedFramework>
   </PropertyGroup>
     
   <ItemGroup Condition="$(MSBuildProjectName.StartsWith('Microsoft.Extensions.'))">
@@ -74,10 +77,8 @@
     <BinPlaceTargetFrameworks Condition="'$(IsNETCoreApp)' == 'true' and '$(BuildingNETCoreAppVertical)' == 'true'" Include="$(NetCoreAppCurrent)-$(TargetOS)">
       <PackageFileRefPath Condition="'$(IsNETCoreAppRef)' == 'true'">$(NETCoreAppPackageRefPath)</PackageFileRefPath>
       <PackageFileRuntimePath>$(NETCoreAppPackageRuntimePath)</PackageFileRuntimePath>
-      <RuntimePath Condition="'$(BinPlaceNETCoreAppPackage)' == 'true'">$(NETCoreAppPackageRuntimePath)\..\runtime\$(TargetOS)-$(Configuration)-$(TargetArchitecture)</RuntimePath>
+      <RuntimePath Condition="'$(BinPlaceNETCoreAppPackage)' == 'true'">$(NETCoreAppPackageRuntimePath)\..\runtime\$(TargetOS)-$(Configuration)-$(TargetArchitecture)\PreTrim</RuntimePath>
       <RefPath Condition="'$(BinPlaceNETCoreAppPackage)' == 'true' and '$(IsNETCoreAppRef)' == 'true'">$(RefRootPath)microsoft.netcore.app\$(Configuration)</RefPath>
-      <!-- enable trimming for any runtime project that's part of the shared framework and hasn't already set ILLinkTrimAssembly -->
-      <SetProperties Condition="'$(BinPlaceRuntime)' == 'true' and '$(ILLinkTrimAssembly)' == ''">ILLinkTrimAssembly=true</SetProperties>
     </BinPlaceTargetFrameworks>
     <BinPlaceTargetFrameworks Condition="'$(IsAspNetCoreApp)' == 'true'" Include="$(NetCoreAppCurrent)">
       <RuntimePath>$(ASPNETCoreAppPackageRuntimePath)</RuntimePath>

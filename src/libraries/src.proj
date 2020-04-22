@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <NativeBinPlaceProject Include="Native\native-binplace.proj" />
+    <ILLinkSharedFrameworkProject Include="illink-sharedframework.proj" />
     <ManualShimProject Include="shims\manual\*.csproj" />
     <ApiCompatProject Include="shims\ApiCompat.proj"
                       Condition="'$(DotNetBuildFromSource)' != 'true' and '$(BuildTargetFramework)' == '$(NetCoreAppCurrent)'" />
@@ -14,6 +15,7 @@
   <!-- Restore only and build before/after. -->
   <ItemGroup Condition="'$(MSBuildRestoreSessionId)' != ''">
     <ProjectReference Include="@(NativeBinPlaceProject)" />
+    <ProjectReference Include="@(ILLinkSharedFrameworkProject)" />
     <ProjectReference Include="@(ManualShimProject)" />
     <ProjectReference Include="@(ApiCompatProject)" />
   </ItemGroup>
@@ -28,6 +30,13 @@
           BeforeTargets="Build">
     <MSBuild Targets="Build"
              Projects="@(NativeBinPlaceProject)"
+             Properties="$(TraversalGlobalProperties)" />
+  </Target>
+
+  <Target Name="ILLinkSharedFramework"
+        AfterTargets="Build">
+    <MSBuild Targets="Build"
+             Projects="@(ILLinkSharedFrameworkProject)"
              Properties="$(TraversalGlobalProperties)" />
   </Target>
 
