@@ -236,6 +236,15 @@ namespace System
             Justification = "Linker doesn't recognize GetMembers(BindingFlags.Public) but this is what the body is doing")]
         public MemberInfo[] GetMembers() => GetMembers(Type.DefaultLookup);
 
+        /// <summary>
+        /// Searches for the constructed generic member that matches the specified generic member definition.
+        /// </summary>
+        /// <param name="member">
+        /// The <see cref="MemberInfo"/> representing the generic definition of the member.
+        /// </param>
+        /// <returns>An object representing the member on the current constructed generic type that matches the specified generic definition, if found; otherwise, null.</returns>
+        public virtual MemberInfo? GetMemberFromGenericMemberDefinition(MemberInfo member) => throw new NotSupportedException(SR.NotSupported_SubclassOverride);
+
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
         public abstract MemberInfo[] GetMembers(BindingFlags bindingAttr);
 
