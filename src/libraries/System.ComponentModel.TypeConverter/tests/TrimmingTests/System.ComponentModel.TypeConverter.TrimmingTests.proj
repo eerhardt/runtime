@@ -1,5 +1,9 @@
 <Project DefaultTargets="Build">
   <Import Project="$([MSBuild]::GetPathOfFileAbove(Directory.Build.props))" />
 
+  <ItemGroup>
+    <TestConsoleAppSourceFiles Include="DesignTimeSerialization.cs" TrimmerRootAssemblies="mscorlib" />
+  </ItemGroup>
+
   <Import Project="$([MSBuild]::GetPathOfFileAbove(Directory.Build.targets))" />
 </Project>
