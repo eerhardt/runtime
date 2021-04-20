@@ -400,7 +400,7 @@
 
     <PropertyGroup>
       <EmccFlagsFile>$([MSBuild]::NormalizePath($(MicrosoftNetCoreAppRuntimePackRidNativeDir), 'src', 'emcc-flags.txt'))</EmccFlagsFile>
-      <WasmNativeStrip Condition="'$(WasmNativeStrip)' == ''">true</WasmNativeStrip>
+      <WasmNativeStrip Condition="'$(WasmNativeStrip)' == ''">false</WasmNativeStrip>
       <WasmLinkIcalls Condition="'$(WasmLinkIcalls)' == ''">$(WasmBuildNative)</WasmLinkIcalls>
     </PropertyGroup>
 

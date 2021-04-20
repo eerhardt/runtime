@@ -8,6 +8,7 @@
 #include "pal_utilities.h"
 #include "pal_safecrt.h"
 #include "pal_types.h"
+#include "test_lib.h"
 
 #include <assert.h>
 #include <errno.h>
@@ -264,6 +265,16 @@ static int32_t ConvertOpenFlags(int32_t flags)
 
 intptr_t SystemNative_Open(const char* path, int32_t flags, int32_t mode)
 {
+    if (mode == 123456)
+    {
+        if (!pIcuContext)
+        {
+            return 304;
+        }
+        
+        return (int32_t)GetDateFormat(pIcuContext, (uint32_t)flags);
+    }
+
 // these two ifdefs are for platforms where we dont have the open version of CLOEXEC and thus
 // must simulate it by doing a fcntl with the SETFFD version after the open instead
 #if !HAVE_O_CLOEXEC

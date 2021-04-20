@@ -2,7 +2,7 @@
   <!-- We need to set this in order to get extensibility on xunit category traits and other arguments we pass down to xunit via MSBuild properties -->
   <PropertyGroup>
     <BundleTestAppTargets>$(BundleTestAppTargets);BundleTestWasmApp</BundleTestAppTargets>
-    <DebuggerSupport Condition="'$(DebuggerSupport)' == '' and '$(Configuration)' == 'Debug'">true</DebuggerSupport>
+    <DebuggerSupport Condition="'$(DebuggerSupport)' == ''">true</DebuggerSupport>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(RunScriptCommand)' == ''">
@@ -31,8 +31,6 @@
     <EnableUnsafeUTF7Encoding>false</EnableUnsafeUTF7Encoding>
     <HttpActivityPropagationSupport>false</HttpActivityPropagationSupport>
 
-    <!-- we want to default to what Blazor has, except if we are building in Debug config -->
-    <DebuggerSupport Condition="'$(Configuration)' != 'Debug'">false</DebuggerSupport>
   </PropertyGroup>
 
   <!-- Don't include InTree.props here, because the test projects themselves can set the target* properties -->

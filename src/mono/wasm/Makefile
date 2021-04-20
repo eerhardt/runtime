@@ -59,6 +59,7 @@ MONO_LIBS = \
 	$(MONO_BIN_DIR)/libmono-icall-table.a \
 	$(MONO_BIN_DIR)/libmono-profiler-aot.a \
 	${NATIVE_BIN_DIR}/libSystem.Native.a \
+	$(TOP)/libdotnet_globalization.a \
 	${NATIVE_BIN_DIR}/libSystem.IO.Compression.Native.a \
 	$(ICU_LIBDIR)/libicuuc.a \
 	$(ICU_LIBDIR)/libicui18n.a

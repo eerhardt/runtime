@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include "pal_icushim_internal.h"
 #include "pal_icushim.h"
+#include "test_lib.h"
 #include <unicode/putil.h>
 #include <unicode/uversion.h>
 #include <unicode/localpointer.h>
@@ -21,6 +22,7 @@
 
 static int32_t isLoaded = 0;
 static int32_t isDataSet = 0;
+DotnetGlobalizationContext* pIcuContext = NULL;
 
 static void log_shim_error(const char* format, ...)
 {
@@ -87,6 +89,8 @@ static int32_t load_icu_data(void* pData)
         log_icu_error("udata_setCommonData", status);
         return 0;
     } else {
+
+    pIcuContext = Initialize(pData);
 
 #if defined(ICU_TRACING)
         // see https://github.com/unicode-org/icu/blob/master/docs/userguide/icu_data/tracing.md
