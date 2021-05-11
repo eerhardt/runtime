@@ -22,6 +22,9 @@ namespace System.Text.Json
 
         internal static readonly JsonSerializerOptions s_defaultOptions = new JsonSerializerOptions();
 
+        private static bool MinSizeOpts { get; } =
+            AppContext.TryGetSwitch("System.Text.Json.MinSizeOpts", out bool minSizeOpts) ? minSizeOpts : false;
+
         private readonly ConcurrentDictionary<Type, JsonTypeInfo> _classes = new ConcurrentDictionary<Type, JsonTypeInfo>();
 
         // Simple LRU cache for the public (de)serialize entry points that avoid some lookups in _classes.
@@ -560,7 +563,14 @@ namespace System.Text.Json
                 if (_memberAccessorStrategy == null)
                 {
 #if NETFRAMEWORK || NETCOREAPP
-                    _memberAccessorStrategy = new ReflectionEmitMemberAccessor();
+                    if (MinSizeOpts)
+                    {
+                        _memberAccessorStrategy = new ReflectionMemberAccessor();
+                    }
+                    else
+                    {
+                        _memberAccessorStrategy = new ReflectionEmitMemberAccessor();
+                    }
 #else
                     _memberAccessorStrategy = new ReflectionMemberAccessor();
 #endif

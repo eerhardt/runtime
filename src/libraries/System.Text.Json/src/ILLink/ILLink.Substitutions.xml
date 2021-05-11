@@ -1,0 +1,7 @@
+﻿<linker>
+  <assembly fullname="System.Text.Json">
+    <type fullname="System.Text.Json.JsonSerializerOptions">
+      <method signature="System.Boolean get_MinSizeOpts()" body="stub" value="true" feature="System.Text.Json.MinSizeOpts" featurevalue="true" />
+    </type>
+  </assembly>
+</linker>
