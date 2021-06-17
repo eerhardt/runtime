@@ -206,35 +206,5 @@ namespace System.Drawing
         {
             return GetResourceStream(type.Module.Assembly, type, originalName);
         }
-
-        /// <summary>
-        /// Returns an Icon created  from a resource stream loaded from the appropriate location according to the current
-        /// suffix.
-        /// </summary>
-        /// <param name="type">The type from whose assembly the stream is loaded and whose namespace is used to scope the resource name</param>
-        /// <param name="originalName">The name of the manifest resource being requested</param>
-        /// <returns>
-        /// The icon created from a manifest resource stream corresponding to <paramref name="originalName"/> with the
-        /// current suffix applied; or if that is not found, the stream corresponding to <paramref name="originalName"/>.
-        /// </returns>
-        public static Icon CreateIcon(Type type, string originalName)
-        {
-            return new Icon(GetResourceStream(type, originalName)!);
-        }
-
-        /// <summary>
-        /// Returns an Bitmap created  from a resource stream loaded from the appropriate location according to the current
-        /// suffix.
-        /// </summary>
-        /// <param name="type">The type from whose assembly the stream is loaded and whose namespace is used to scope the resource name</param>
-        /// <param name="originalName">The name of the manifest resource being requested</param>
-        /// <returns>
-        /// The bitmap created from a manifest resource stream corresponding to <paramref name="originalName"/> with the
-        /// current suffix applied; or if that is not found, the stream corresponding to <paramref name="originalName"/>.
-        /// </returns>
-        public static Bitmap CreateBitmap(Type type, string originalName)
-        {
-            return new Bitmap(GetResourceStream(type, originalName)!);
-        }
     }
 }

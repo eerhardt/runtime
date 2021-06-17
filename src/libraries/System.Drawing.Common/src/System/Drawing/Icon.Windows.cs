@@ -4,6 +4,7 @@
 using System.Buffers;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Drawing.Internal;
@@ -637,6 +638,8 @@ namespace System.Drawing
             }
         }
 
+        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(IPicture))]
+        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(Interop.Ole32.IStream))]
         public void Save(Stream outputStream)
         {
             if (_iconData != null)
