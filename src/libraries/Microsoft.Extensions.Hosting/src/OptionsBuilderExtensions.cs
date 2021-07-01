@@ -27,24 +27,49 @@ namespace Microsoft.Extensions.DependencyInjection
             }
 
             optionsBuilder.Services.AddHostedService<ValidationHostedService>();
+
+            ConfigureOptionsClosure<TOptions> closure = new ConfigureOptionsClosure<TOptions>(optionsBuilder);
             optionsBuilder.Services.AddOptions<ValidatorOptions>()
-                .Configure<IOptionsMonitor<TOptions>>((vo, options) => ValidateOnStartHelper(vo, options, optionsBuilder));
+                .Configure(new Action<ValidatorOptions, IOptionsMonitor<TOptions>>(closure.ConfigureOptions));
 
             return optionsBuilder;
         }
 
-        [UnconditionalSuppressMessage("ReflectionAnalysis", "IL2091:UnrecognizedReflectionPattern",
-            Justification = "Workaround for https://github.com/mono/linker/issues/1416. Outer method has been annotated with DynamicallyAccessedMembers.")]
-        private static void ValidateOnStartHelper<TOptions>(ValidatorOptions vo, IOptionsMonitor<TOptions> options, OptionsBuilder<TOptions> optionsBuilder)
+        private readonly struct ConfigureOptionsClosure<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] TOptions>
             where TOptions : class
         {
-            // This adds an action that resolves the options value to force evaluation
-            // We don't care about the result as duplicates are not important
-            vo.Validators[typeof(TOptions)] = () => GetOptionsMethod(options, optionsBuilder);
+            private readonly OptionsBuilder<TOptions> _optionsBuilder;
+
+            public ConfigureOptionsClosure(OptionsBuilder<TOptions> optionsBuilder)
+            {
+                _optionsBuilder = optionsBuilder;
+            }
+
+            public void ConfigureOptions(ValidatorOptions vo, IOptionsMonitor<TOptions> options)
+            {
+                // This adds an action that resolves the options value to force evaluation
+                // We don't care about the result as duplicates are not important
+                GetOptionsClosure<TOptions> closure = new GetOptionsClosure<TOptions>(options, _optionsBuilder);
+                vo.Validators[typeof(TOptions)] = new Action(closure.GetOptions);
+            }
         }
 
-        [UnconditionalSuppressMessage("ReflectionAnalysis", "IL2091:UnrecognizedReflectionPattern",
-            Justification = "Workaround for https://github.com/mono/linker/issues/1416. Outer method has been annotated with DynamicallyAccessedMembers.")]
-        private static void GetOptionsMethod<TOptions>(IOptionsMonitor<TOptions> options, OptionsBuilder<TOptions> optionsBuilder) where TOptions : class => options.Get(optionsBuilder.Name);
+        private readonly struct GetOptionsClosure<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] TOptions>
+            where TOptions : class
+        {
+            private readonly IOptionsMonitor<TOptions> _options;
+            private readonly OptionsBuilder<TOptions> _optionsBuilder;
+
+            public GetOptionsClosure(IOptionsMonitor<TOptions> options, OptionsBuilder<TOptions> optionsBuilder)
+            {
+                _options = options;
+                _optionsBuilder = optionsBuilder;
+            }
+
+            public void GetOptions()
+            {
+                _options.Get(_optionsBuilder.Name);
+            }
+        }
     }
 }
